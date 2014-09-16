@@ -20,13 +20,17 @@ def printUsage():
   print('USAGE: {} <tool> <version>'.format(sys.argv[0]))
 
 def validateInput():
-  if len(sys.argv) == 1:
-    print('no arguments given')
+  if len(sys.argv) != 3:
+    print('wrong number of arguments')
     printUsage()
     sys.exit(1)
-  if len(sys.argv) != 3:
-    print('wrong arguments number')
-    printUsage()
+  tool = sys.argv[1]
+  version = sys.argv[2]
+  if tool not in tools:
+    print('unknown tool {}'.format(tool))
+    sys.exit(1)
+  if version not in tools[tool]:
+    print('unknown {} version {}'.format(tool, version))
     sys.exit(1)
   
 def createPaths():
