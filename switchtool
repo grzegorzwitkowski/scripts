@@ -10,14 +10,31 @@ tools = {
     '1.8': 'jdk1.8'
   }
 }
+    
+class Paths:
+  def __init__(self, linkPath, toolPath):
+    self.linkPath = linkPath
+    self.toolPath = toolPath
+
+def printUsage():
+  print('USAGE: {} <tool> <version>'.format(sys.argv[0]))
 
 def validateInput():
   if len(sys.argv) == 1:
     print('no arguments given')
+    printUsage()
     sys.exit(1)
-
-def pathExistsButIsNotSymbolicLink(path):
-  return 
+  if len(sys.argv) != 3:
+    print('wrong arguments number')
+    printUsage()
+    sys.exit(1)
+  
+def createPaths():
+  tool = sys.argv[1]
+  version = sys.argv[2]
+  linkPath = tools_dir + '/' + tool
+  toolPath = tools_dir + '/' + tools[tool][version]
+  return Paths(linkPath, toolPath)
 
 def validatePaths(linkPath, toolPath):
   if os.path.exists(linkPath) and not os.path.islink(linkPath):
@@ -32,12 +49,8 @@ def validatePaths(linkPath, toolPath):
 
 if __name__ == "__main__":
   validateInput()
-  tool = sys.argv[1]
-  version = sys.argv[2]
-  linkPath = tools_dir + '/' + tool
-  toolPath = tools_dir + '/' + tools[tool][version]
-  validatePaths(linkPath, toolPath)
-  
-  if os.path.exists(linkPath):
-    os.remove(linkPath)
-  os.symlink(toolPath, linkPath)
+  p = createPaths()
+  validatePaths(p.linkPath, p.toolPath)
+  if os.path.exists(p.linkPath):
+    os.remove(p.linkPath)
+  os.symlink(p.toolPath, p.linkPath)
