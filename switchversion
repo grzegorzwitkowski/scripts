@@ -1,60 +1,54 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import sys
 import os
 
-tools_dir = '/home/brylant/Development/Tools'
+tools_dir = 'C:/ProgramFiles'
 tools = {
   'jdk': {
-    '1.7': 'jdk1.7',
-    '1.8': 'jdk1.8'
+    '1.7': 'jdk1.7.0_79',
+    '1.8': 'jdk1.8.0_101'
   }
 }
-    
+
 class Paths:
-  def __init__(self, linkPath, toolPath):
-    self.linkPath = linkPath
-    self.toolPath = toolPath
+  def __init__(self, link, tool):
+    self.link = link
+    self.tool = tool
 
-def printUsage():
-  print('USAGE: {} <tool> <version>'.format(sys.argv[0]))
-
-def validateInput():
+def validate_input():
   if len(sys.argv) != 3:
-    print('wrong number of arguments')
-    printUsage()
+    print('wrong number of arguments\nUSAGE: {} <tool> <version>'.format(sys.argv[0]))
     sys.exit(1)
-  tool = sys.argv[1]
-  version = sys.argv[2]
+  script_path, tool, version = sys.argv
   if tool not in tools:
     print('unknown tool {}'.format(tool))
     sys.exit(1)
   if version not in tools[tool]:
     print('unknown {} version {}'.format(tool, version))
     sys.exit(1)
-  
-def createPaths():
-  tool = sys.argv[1]
-  version = sys.argv[2]
-  linkPath = tools_dir + '/' + tool
-  toolPath = tools_dir + '/' + tools[tool][version]
-  return Paths(linkPath, toolPath)
 
-def validatePaths(linkPath, toolPath):
-  if os.path.exists(linkPath) and not os.path.islink(linkPath):
-    print('ERROR: path {} exists but is not a symbolic link'.format(linkPath))
+def create_paths():
+  script_path, tool, version = sys.argv
+  link_path = tools_dir + '/' + tool
+  tool_path = tools_dir + '/' + tools[tool][version]
+  return Paths(link_path, tool_path)
+
+def validate_paths(p):
+  if os.path.exists(p.link) and not os.path.islink(p.link):
+    print('ERROR: path {} exists but is not a symbolic link'.format(p.link))
     sys.exit(1)
-  if not os.path.exists(toolPath):
-    print('ERROR: directory {} does not exist'.format(toolPath))
+  if not os.path.exists(p.tool):
+    print('ERROR: directory {} does not exist'.format(p.tool))
     sys.exit(1)
-  elif not os.path.isdir(toolPath):
-    print('ERROR: path {} exists but is not a directory'.format(toolPath))
+  elif not os.path.isdir(p.tool):
+    print('ERROR: path {} exists but is not a directory'.format(p.tool))
     sys.exit(1)
 
 if __name__ == "__main__":
-  validateInput()
-  p = createPaths()
-  validatePaths(p.linkPath, p.toolPath)
-  if os.path.exists(p.linkPath):
-    os.remove(p.linkPath)
-  os.symlink(p.toolPath, p.linkPath)
+  validate_input()
+  p = create_paths()
+  validate_paths(p)
+  if os.path.exists(p.link):
+    os.remove(p.link)
+  os.symlink(p.tool, p.link)
